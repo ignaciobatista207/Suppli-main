@@ -10,7 +10,7 @@ Integrantes:
 
 Proyecto institucional **E.E.S.T Nº4 de Berazategui**.
 
-## Elevator's hola chau adios
+## Elevator's Pitch
 
 - Para {cliente objetivo}
 - Quienes {necesidad y/o oportunidad}
