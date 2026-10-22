@@ -10,7 +10,7 @@ Integrantes:
 
 Proyecto institucional **E.E.S.T Nº4 de Berazategui**.
 
-## Elevator's niggger monkey holaaaaaaaa
+## Elevator's hola como estan
 
 - Para {cliente objetivo}
 - Quienes {necesidad y/o oportunidad}
