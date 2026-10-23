@@ -25,6 +25,19 @@ Proyecto institucional **E.E.S.T Nº4 de Berazategui**.
 - Extensión PDO habilitada.
 - MySQL o PostgreSQL según la configuración en el archivo `.env`.
 
+
+## MVP
+- Login de usuarios
+- Crear repositorio (el usuario es administrador al crearlo)
+- Crear góndolas
+- Cargar productos (nombre, precio, fecha de ingreso, vencimiento, cantidad, categoría)
+- Sumar/restar cantidades
+- Caja registradora con descuento automático de stock
+
+## Extras (si sobra tiempo)
+- Subcategorías
+- Unirse a un repositorio con contraseña
+
 ## Migraciones
 
 Colocá tus archivos `.sql` en `src/database/migrations/` y ejecuta:
