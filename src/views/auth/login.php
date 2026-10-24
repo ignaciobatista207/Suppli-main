@@ -29,7 +29,7 @@ $old = $old ?? [];
             colors: {
               suppli: {
                 DEFAULT: '#294370',
-                dark: '#1B2D4D',
+                dark: '#000000',
                 cream: '#f5f0e8'
               }
             },
