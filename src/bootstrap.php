@@ -24,13 +24,32 @@ $app = AppFactory::create();
 // Crear el motor de plantillas
 $renderer = new PhpRenderer(
   templatePath: __DIR__ . "/views",
-  attributes: ["title" => "PDI | Slim Template 2026"],
+  attributes: ["title" => "Suppli"],
 );
 
-// Ruta/Vista principal
+// --- Rutas de la fase 1 (landing y autenticación) ---
+// Estas 3 vistas son documentos HTML completos, por eso se renderizan
+// directo con $renderer->render() y NO pasan por view()/layouts/base.php.
+
+// Landing
 $app->get("/", function ($request, $response) use ($renderer) {
-  return view($renderer, $response, "index.php");
+  return $renderer->render($response, "index.php");
 });
+
+// Login
+$app->get("/login", function ($request, $response) use ($renderer) {
+  return $renderer->render($response, "auth/login.php");
+});
+
+// Registro
+$app->get("/register", function ($request, $response) use ($renderer) {
+  return $renderer->render($response, "auth/registro.php");
+});
+
+// TODO (fase 2): POST /login    → validar credenciales, iniciar sesión
+//                                  y, si falla, volver a renderizar con $error y $old.
+// TODO (fase 2): POST /register → validar datos, crear usuario
+//                                  y, si falla, volver a renderizar con $errors y $old.
 
 $app->addErrorMiddleware($debug, true, true);
 
