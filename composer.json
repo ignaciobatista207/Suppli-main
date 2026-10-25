@@ -12,11 +12,17 @@
     "migrate": "php scripts/migrate.php",
     "serve": "php -S localhost:8000 -t public"
   },
-  "autoload": {
-    "files": [
-      "./src/utils/html.php",
-      "./src/utils/view.php"
-    ]
+ "autoload": {
+  "psr-4": {
+    "App\\Controllers\\": "src/controllers/",
+    "App\\Middleware\\": "src/middleware/",
+    "App\\Models\\": "src/models/"
   },
+  "files": [
+    "./src/utils/html.php",
+    "./src/utils/view.php",
+    "./src/utils/http.php"
+  ]
+},
   "license": "MIT"
 }
