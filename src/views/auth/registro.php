@@ -48,13 +48,13 @@ $old = $old ?? [];
 
       <!-- MITAD IZQUIERDA: marca (idéntica en las 3 pantallas) -->
       <header class="relative isolate overflow-hidden bg-suppli-dark px-6 py-8 text-center lg:flex lg:items-center lg:justify-center lg:px-16 lg:py-12">
-        <img src="/images-suppli/editSuppli1.png" alt=""
-             class="absolute inset-0 -z-20 h-full w-full object-cover">
+        <img src="/images-suppli/editSuppli1.jpg" alt=""
+             class="absolute inset-0 -z-20 h-full w-full object-cover saturate-0">
         <div class="absolute inset-0 -z-10 bg-suppli/80" aria-hidden="true"></div>
 
         <a href="/"
            class="inline-block rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-suppli-cream lg:absolute lg:left-12 lg:top-12">
-          <img src="/images-suppli/pngsuppliCrema.png" alt="Suppli" class="h-auto w-32 lg:w-44">
+          <img src="/images-suppli/supplipngCrema.png" alt="Suppli" class="h-auto w-32 lg:w-44">
         </a>
 
         <div class="mt-6 max-w-xl lg:mt-0">
@@ -149,7 +149,7 @@ $old = $old ?? [];
       <!-- PIE: centrado sobre el ancho total -->
       <footer class="my-6 justify-self-center lg:absolute lg:bottom-6 lg:left-1/2 lg:my-0 lg:-translate-x-1/2">
         <p class="w-max max-w-[calc(100vw-2rem)] rounded-full bg-suppli-cream px-4 py-1.5 text-center text-xs text-suppli-dark shadow-md ring-1 ring-suppli/25 sm:text-[0.8rem] lg:whitespace-nowrap">
-          © IB Consultoras. Todos los derechos reservados.
+          © IB Consultora. Todos los derechos reservados.
         </p>
       </footer>
 
