@@ -5,6 +5,7 @@ use Slim\Views\PhpRenderer;
 use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/database/database.php';
 
 // Cargar variables de entorno desde el .env
 Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
@@ -18,6 +19,18 @@ if (!in_array($env, $allowedEnvs, true)) {
 
 $debug = $env === "dev";
 
+// Sesión nativa de PHP (guarda solo el id del usuario autenticado)
+if (session_status() === PHP_SESSION_NONE) {
+  session_set_cookie_params([
+    "lifetime" => 0,
+    "path" => "/",
+    "httponly" => true,
+    "samesite" => "Lax",
+    "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
+  ]);
+  session_start();
+}
+
 // Crear la aplicacion de Slim
 $app = AppFactory::create();
 
@@ -27,29 +40,11 @@ $renderer = new PhpRenderer(
   attributes: ["title" => "Suppli"],
 );
 
-// --- Rutas de la fase 1 (landing y autenticación) ---
-// Estas 3 vistas son documentos HTML completos, por eso se renderizan
-// directo con $renderer->render() y NO pasan por view()/layouts/base.php.
+// La conexión es perezosa: no se abre hasta la primera consulta
+$database = new Database();
 
-// Landing
-$app->get("/", function ($request, $response) use ($renderer) {
-  return $renderer->render($response, "index.php");
-});
-
-// Login
-$app->get("/login", function ($request, $response) use ($renderer) {
-  return $renderer->render($response, "auth/login.php");
-});
-
-// Registro
-$app->get("/register", function ($request, $response) use ($renderer) {
-  return $renderer->render($response, "auth/registro.php");
-});
-
-// TODO (fase 2): POST /login    → validar credenciales, iniciar sesión
-//                                  y, si falla, volver a renderizar con $error y $old.
-// TODO (fase 2): POST /register → validar datos, crear usuario
-//                                  y, si falla, volver a renderizar con $errors y $old.
+// Rutas
+(require __DIR__ . '/routes/web.php')($app, $renderer, $database);
 
 $app->addErrorMiddleware($debug, true, true);
 
