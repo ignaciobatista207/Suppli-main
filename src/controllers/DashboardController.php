@@ -27,8 +27,18 @@ final class DashboardController
       return redirect($response, "/login");
     }
 
-    return view($this->renderer, $response, "dashboard/index.php", [
-      "user" => $user,
-    ]);
+    return view(
+      $this->renderer,
+      $response,
+      "dashboard/index.php",
+      [
+        "title" => "Inicio | Suppli",
+        "userName" => (string) $user["name"],
+        "activeNav" => "inicio",
+        "errors" => [],
+        "old" => [],
+      ],
+      "layouts/app.php",
+    );
   }
 }
