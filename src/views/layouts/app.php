@@ -27,7 +27,7 @@ $navItem = "flex items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-s
   . "focus-visible:outline-offset-2 focus-visible:outline-ink lg:justify-start lg:px-3";
 
 $items = [
-  ["key" => "inicio",       "href" => "/dashboard",    "icon" => "botonInicio.png", "label" => "Inicio"],
+  ["key" => "inicio",       "href" => "/dashboard",    "icon" => "botonHome.png", "label" => "Inicio"],
   // TODO: crear la ruta /repositorios
   ["key" => "repositorios", "href" => "/repositorios", "icon" => "botonRepo.png",   "label" => "Repositorios"],
   // TODO: crear la ruta /caja (vista aparte, sin este layout)
