@@ -11,7 +11,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Suppli | Tu stock y tu caja, en el mismo lugar</title>
+    <title>Suppli | Gestión de stock</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +56,7 @@
 
         <div class="mt-6 max-w-xl lg:mt-0">
           <h1 class="font-display text-3xl font-extrabold leading-tight tracking-tight text-suppli-cream sm:text-4xl lg:text-5xl">
-            Tu stock y tu caja, en el mismo lugar
+            Tu stock, siempre en el mismo lugar
           </h1>
           <p class="mt-3 text-base text-suppli-cream/95 lg:mt-5 lg:text-xl">
             Con Suppli, siempre sabes qué tienes a mano
