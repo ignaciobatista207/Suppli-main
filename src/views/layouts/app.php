@@ -132,89 +132,77 @@ $logoutIcon = '<svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" str
     </a>
   </header>
 
-  <!-- ÁREA PRINCIPAL -->
-  <main id="contenido" class="flex min-h-0 overflow-y-auto bg-canvas text-ink">
+   <!-- ÁREA PRINCIPAL -->
+  <main id="contenido" class="min-h-0 overflow-y-auto bg-canvas text-ink">
+    <?php $flash = pull_flash(); ?>
+    <?php if ($flash !== null): ?>
+      <div class="mx-auto w-full max-w-5xl px-6 pt-6">
+        <p role="status" class="rounded-lg border border-ink/30 bg-card px-4 py-3 text-sm font-medium">
+          <?= html($flash) ?>
+        </p>
+      </div>
+    <?php endif; ?>
     <?= $content ?? "" ?>
   </main>
 </div>
 
 <script>
+  // Viñetas (<dialog>) reutilizables.
+  //   Botón que abre:   data-dialog-open="id-de-la-viñeta"
+  //   La viñeta:        <dialog data-dialog data-autoopen="0|1"> ... </dialog>
+  //   Cierre:           cualquier elemento con data-close
+  //   Foco inicial:     elemento con data-autofocus (si no, el primer campo)
   (function () {
-    // Buscador: solo visual
-    var search = document.querySelector('[role="search"]');
-    if (search) {
-      search.addEventListener('submit', function (e) {
-        e.preventDefault();
-        // TODO: implementar búsqueda real
-      });
+    if (typeof HTMLDialogElement === 'undefined') return;
+
+    var scrollArea = document.getElementById('contenido');
+
+    function lockScroll(lock) {
+      document.documentElement.style.overflow = lock ? 'hidden' : '';
+      if (scrollArea) scrollArea.style.overflow = lock ? 'hidden' : '';
     }
 
-    // Tema
-    var root  = document.documentElement;
-    var wrap  = document.getElementById('theme-wrap');
-    var btn   = document.getElementById('theme-btn');
-    var menu  = document.getElementById('theme-menu');
-    var items = Array.prototype.slice.call(menu.querySelectorAll('[role="menuitemradio"]'));
-
-    function current() { return root.getAttribute('data-theme') === 'bn' ? 'bn' : 'suppli'; }
-
-    function sync() {
-      items.forEach(function (item) {
-        item.setAttribute('aria-checked', String(item.dataset.themeOption === current()));
-      });
+    function openDialog(dialog, opener) {
+      if (dialog.open) return;
+      dialog.__opener = opener || null;
+      dialog.showModal();
+      lockScroll(true);
+      var first = dialog.querySelector('[data-autofocus]') ||
+                  dialog.querySelector('input:not([type="hidden"]), select, textarea');
+      if (first) first.focus();
     }
 
-    function isOpen() { return !menu.hidden; }
-
-    function openMenu() {
-      menu.hidden = false;
-      btn.setAttribute('aria-expanded', 'true');
-      sync();
-      var selected = items.filter(function (i) { return i.getAttribute('aria-checked') === 'true'; })[0];
-      (selected || items[0]).focus();
-    }
-
-    function closeMenu(returnFocus) {
-      menu.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
-      if (returnFocus) btn.focus();
-    }
-
-    function applyTheme(theme) {
-      root.setAttribute('data-theme', theme);
-      try { localStorage.setItem('suppli-theme', theme); } catch (err) {}
-      sync();
-    }
-
-    btn.addEventListener('click', function () { isOpen() ? closeMenu(false) : openMenu(); });
-    btn.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!isOpen()) openMenu(); }
-    });
-
-    items.forEach(function (item) {
-      item.addEventListener('click', function () {
-        applyTheme(item.dataset.themeOption);
-        closeMenu(true);
+    document.querySelectorAll('[data-dialog-open]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var dialog = document.getElementById(btn.getAttribute('data-dialog-open'));
+        if (dialog) openDialog(dialog, btn);
       });
     });
 
-    menu.addEventListener('keydown', function (e) {
-      var i = items.indexOf(document.activeElement);
-      if (e.key === 'ArrowDown')      { e.preventDefault(); items[(i + 1) % items.length].focus(); }
-      else if (e.key === 'ArrowUp')   { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
-      else if (e.key === 'Home')      { e.preventDefault(); items[0].focus(); }
-      else if (e.key === 'End')       { e.preventDefault(); items[items.length - 1].focus(); }
-      else if (e.key === 'Tab')       { e.preventDefault(); closeMenu(true); }
-    });
+    document.querySelectorAll('dialog[data-dialog]').forEach(function (dialog) {
+      var downOnBackdrop = false;
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen()) { e.preventDefault(); closeMenu(true); }
-    });
+      dialog.querySelectorAll('[data-close]').forEach(function (el) {
+        el.addEventListener('click', function () { dialog.close(); });
+      });
 
-    document.addEventListener('click', function (e) {
-      if (isOpen() && !wrap.contains(e.target)) closeMenu(false);
-    });
+      // Clic en el fondo oscuro (evita cerrar si se arrastró una selección desde dentro)
+      dialog.addEventListener('mousedown', function (e) { downOnBackdrop = (e.target === dialog); });
+      dialog.addEventListener('click', function (e) {
+        if (e.target === dialog && downOnBackdrop) dialog.close();
+        downOnBackdrop = false;
+      });
 
-    sync();
+      // Se dispara con ×, Cancelar, Esc y clic en el fondo
+      dialog.addEventListener('close', function () {
+        lockScroll(false);
+        if (dialog.__opener) dialog.__opener.focus();
+      });
+
+      // Si el servidor devolvió errores, abrir al cargar
+      if (dialog.getAttribute('data-autoopen') === '1') {
+        openDialog(dialog, document.querySelector('[data-dialog-open="' + dialog.id + '"]'));
+      }
+    });
   })();
 </script>
