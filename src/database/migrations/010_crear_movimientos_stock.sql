@@ -6,7 +6,7 @@
 CREATE TABLE stock_movements (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     product_id INT UNSIGNED NOT NULL,
-    user_id    INT UNSIGNED NOT NULL,
+    user_id    INT UNSIGNED    NOT NULL,
     sale_id    INT UNSIGNED NULL,
     type       ENUM('entrada', 'salida', 'venta', 'ajuste') NOT NULL,
     quantity   INT          NOT NULL,

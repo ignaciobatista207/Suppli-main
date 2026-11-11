@@ -1,6 +1,9 @@
--- Repositorios (cada negocio o depósito). Para unirse se usa nombre + contraseña.
+-- Repositorios (cada negocio/depósito). Para unirse se usa nombre + contraseña.
 -- La contraseña se guarda hasheada (password_hash), nunca en texto plano.
+-- created_by referencia users.id (INT UNSIGNED): el tipo debe coincidir exactamente.
+-- color: uno de la paleta fija de la app (se valida en el servidor).
 CREATE TABLE repositories (
+<<<<<<< HEAD
 <<<<<<< HEAD
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name          VARCHAR(100)    NOT NULL,
@@ -18,9 +21,17 @@ CREATE TABLE repositories (
     created_by    INT UNSIGNED NOT NULL,
     created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 >>>>>>> e3aebd6 (cambios en la BD)
+=======
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name          VARCHAR(100)    NOT NULL,
+    password_hash VARCHAR(255)    NOT NULL,
+    color         VARCHAR(7)      NOT NULL DEFAULT '#294370',
+    created_by    INT UNSIGNED    NOT NULL,
+    created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+>>>>>>> cb34803 (corregir migraciones)
     PRIMARY KEY (id),
     UNIQUE KEY uq_repositories_name (name),
-    KEY idx_repositories_created_by (created_by),
     CONSTRAINT fk_repositories_created_by
 <<<<<<< HEAD
 <<<<<<< HEAD
