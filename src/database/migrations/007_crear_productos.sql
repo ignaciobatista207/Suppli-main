@@ -3,10 +3,9 @@
 -- el historial de movimientos y ventas.
 -- category_id apunta al catálogo global (principal o subcategoría).
 CREATE TABLE products (
-    id            INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    repository_id INT UNSIGNED  NOT NULL,
-    gondola_id    INT UNSIGNED  NOT NULL,
-    category_id   INT UNSIGNED    NULL,
+      id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    repository_id BIGINT UNSIGNED NOT NULL,
+    gondola_id    BIGINT UNSIGNED NOT NULL,
     name          VARCHAR(150)  NOT NULL,
     price         DECIMAL(10,2) NOT NULL,
     stock         INT           NOT NULL DEFAULT 0,
