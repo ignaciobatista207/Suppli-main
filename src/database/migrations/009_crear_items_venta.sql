@@ -2,8 +2,8 @@
 -- para que cambiar el precio del producto no altere ventas pasadas.
 CREATE TABLE sale_items (
     id         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    sale_id    INT UNSIGNED  NOT NULL,
-    product_id INT UNSIGNED  NOT NULL,
+    sale_id   BIGINT UNSIGNED NOT NULL,
+    product_id BIGINT UNSIGNED NOT NULL,
     quantity   INT           NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     subtotal   DECIMAL(12,2) NOT NULL,

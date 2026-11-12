@@ -1,7 +1,7 @@
 -- Cabecera de cada venta de la caja registradora.
 CREATE TABLE sales (
     id            INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    repository_id INT UNSIGNED  NOT NULL,
+    repository_id BIGINT UNSIGNED NOT NULL,
     user_id       INT UNSIGNED    NOT NULL
     total         DECIMAL(12,2) NOT NULL,
     created_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
