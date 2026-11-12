@@ -28,7 +28,6 @@ $navItem = "flex items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-s
 
 $items = [
   ["key" => "inicio",       "href" => "/dashboard",    "icon" => "botonHome.png", "label" => "Inicio"],
-  // TODO: crear la ruta /repositorios
   ["key" => "repositorios", "href" => "/repositorios", "icon" => "botonRepo.png",   "label" => "Repositorios"],
   // TODO: crear la ruta /caja (vista aparte, sin este layout)
   ["key" => "caja",         "href" => "/caja",         "icon" => "botonCaja.png",   "label" => "Caja registradora"],
@@ -42,6 +41,8 @@ $logoutClass = "flex w-full items-center justify-center gap-3 rounded-lg border 
 $logoutIcon = '<svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
   . 'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
   . '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>';
+
+$flash = pull_flash();
 ?>
 <div class="fixed inset-0 grid grid-cols-[minmax(4rem,15%)_minmax(0,1fr)] grid-rows-[minmax(3.5rem,10%)_minmax(0,1fr)] overflow-hidden">
 
@@ -83,7 +84,7 @@ $logoutIcon = '<svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" str
                     class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink hover:bg-ink/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink">
               <span aria-hidden="true" class="h-5 w-5 shrink-0 rounded-full border border-black/20"
                     style="background:linear-gradient(135deg,#f5f0e8 50%,#294370 50%)"></span>
-              <span class="flex-1">Suppli</span>
+              <span class="flex-1">Original (Suppli)</span>
             </button>
             <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" data-theme-option="bn"
                     class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink hover:bg-ink/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink">
@@ -132,9 +133,8 @@ $logoutIcon = '<svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" str
     </a>
   </header>
 
-   <!-- ÁREA PRINCIPAL -->
+  <!-- ÁREA PRINCIPAL -->
   <main id="contenido" class="min-h-0 overflow-y-auto bg-canvas text-ink">
-    <?php $flash = pull_flash(); ?>
     <?php if ($flash !== null): ?>
       <div class="mx-auto w-full max-w-5xl px-6 pt-6">
         <p role="status" class="rounded-lg border border-ink/30 bg-card px-4 py-3 text-sm font-medium">
@@ -147,62 +147,152 @@ $logoutIcon = '<svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" str
 </div>
 
 <script>
-  // Viñetas (<dialog>) reutilizables.
+  // BUSCADOR (solo visual) + TEMA
+  (function () {
+    try {
+      var search = document.querySelector('[role="search"]');
+      if (search) {
+        search.addEventListener('submit', function (e) {
+          e.preventDefault();
+          // TODO: implementar búsqueda real
+        });
+      }
+
+      var root  = document.documentElement;
+      var wrap  = document.getElementById('theme-wrap');
+      var btn   = document.getElementById('theme-btn');
+      var menu  = document.getElementById('theme-menu');
+      if (!wrap || !btn || !menu) return;
+
+      var items = Array.prototype.slice.call(menu.querySelectorAll('[role="menuitemradio"]'));
+
+      function current() { return root.getAttribute('data-theme') === 'bn' ? 'bn' : 'suppli'; }
+
+      function sync() {
+        items.forEach(function (item) {
+          item.setAttribute('aria-checked', String(item.getAttribute('data-theme-option') === current()));
+        });
+      }
+
+      function isOpen() { return !menu.hidden; }
+
+      function openMenu() {
+        menu.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        sync();
+        var selected = items.filter(function (i) { return i.getAttribute('aria-checked') === 'true'; })[0];
+        (selected || items[0]).focus();
+      }
+
+      function closeMenu(returnFocus) {
+        menu.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        if (returnFocus) btn.focus();
+      }
+
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        try { localStorage.setItem('suppli-theme', theme); } catch (err) {}
+        sync();
+      }
+
+      btn.addEventListener('click', function () { if (isOpen()) closeMenu(false); else openMenu(); });
+      btn.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!isOpen()) openMenu(); }
+      });
+
+      items.forEach(function (item) {
+        item.addEventListener('click', function () {
+          applyTheme(item.getAttribute('data-theme-option'));
+          closeMenu(true);
+        });
+      });
+
+      menu.addEventListener('keydown', function (e) {
+        var i = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown')    { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+        else if (e.key === 'Home')    { e.preventDefault(); items[0].focus(); }
+        else if (e.key === 'End')     { e.preventDefault(); items[items.length - 1].focus(); }
+        else if (e.key === 'Tab')     { e.preventDefault(); closeMenu(true); }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && isOpen()) { e.preventDefault(); closeMenu(true); }
+      });
+
+      document.addEventListener('click', function (e) {
+        if (isOpen() && !wrap.contains(e.target)) closeMenu(false);
+      });
+
+      sync();
+    } catch (err) {
+      console.error('Tema:', err);
+    }
+  })();
+</script>
+
+<script>
+  // VIÑETAS (<dialog>) reutilizables.
   //   Botón que abre:   data-dialog-open="id-de-la-viñeta"
   //   La viñeta:        <dialog data-dialog data-autoopen="0|1"> ... </dialog>
   //   Cierre:           cualquier elemento con data-close
   //   Foco inicial:     elemento con data-autofocus (si no, el primer campo)
   (function () {
-    if (typeof HTMLDialogElement === 'undefined') return;
+    try {
+      if (typeof HTMLDialogElement === 'undefined') return;
 
-    var scrollArea = document.getElementById('contenido');
+      var scrollArea = document.getElementById('contenido');
 
-    function lockScroll(lock) {
-      document.documentElement.style.overflow = lock ? 'hidden' : '';
-      if (scrollArea) scrollArea.style.overflow = lock ? 'hidden' : '';
-    }
-
-    function openDialog(dialog, opener) {
-      if (dialog.open) return;
-      dialog.__opener = opener || null;
-      dialog.showModal();
-      lockScroll(true);
-      var first = dialog.querySelector('[data-autofocus]') ||
-                  dialog.querySelector('input:not([type="hidden"]), select, textarea');
-      if (first) first.focus();
-    }
-
-    document.querySelectorAll('[data-dialog-open]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var dialog = document.getElementById(btn.getAttribute('data-dialog-open'));
-        if (dialog) openDialog(dialog, btn);
-      });
-    });
-
-    document.querySelectorAll('dialog[data-dialog]').forEach(function (dialog) {
-      var downOnBackdrop = false;
-
-      dialog.querySelectorAll('[data-close]').forEach(function (el) {
-        el.addEventListener('click', function () { dialog.close(); });
-      });
-
-      // Clic en el fondo oscuro (evita cerrar si se arrastró una selección desde dentro)
-      dialog.addEventListener('mousedown', function (e) { downOnBackdrop = (e.target === dialog); });
-      dialog.addEventListener('click', function (e) {
-        if (e.target === dialog && downOnBackdrop) dialog.close();
-        downOnBackdrop = false;
-      });
-
-      // Se dispara con ×, Cancelar, Esc y clic en el fondo
-      dialog.addEventListener('close', function () {
-        lockScroll(false);
-        if (dialog.__opener) dialog.__opener.focus();
-      });
-
-      // Si el servidor devolvió errores, abrir al cargar
-      if (dialog.getAttribute('data-autoopen') === '1') {
-        openDialog(dialog, document.querySelector('[data-dialog-open="' + dialog.id + '"]'));
+      function lockScroll(lock) {
+        document.documentElement.style.overflow = lock ? 'hidden' : '';
+        if (scrollArea) scrollArea.style.overflow = lock ? 'hidden' : '';
       }
-    });
+
+      function openDialog(dialog, opener) {
+        if (dialog.open) return;
+        dialog.__opener = opener || null;
+        dialog.showModal();
+        lockScroll(true);
+        var first = dialog.querySelector('[data-autofocus]') ||
+                    dialog.querySelector('input:not([type="hidden"]), select, textarea');
+        if (first) first.focus();
+      }
+
+      document.querySelectorAll('[data-dialog-open]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dialog = document.getElementById(btn.getAttribute('data-dialog-open'));
+          if (dialog) openDialog(dialog, btn);
+        });
+      });
+
+      document.querySelectorAll('dialog[data-dialog]').forEach(function (dialog) {
+        var downOnBackdrop = false;
+
+        dialog.querySelectorAll('[data-close]').forEach(function (el) {
+          el.addEventListener('click', function () { dialog.close(); });
+        });
+
+        // Clic en el fondo oscuro (evita cerrar si se arrastró una selección desde dentro)
+        dialog.addEventListener('mousedown', function (e) { downOnBackdrop = (e.target === dialog); });
+        dialog.addEventListener('click', function (e) {
+          if (e.target === dialog && downOnBackdrop) dialog.close();
+          downOnBackdrop = false;
+        });
+
+        // Se dispara con ×, Cancelar, Esc y clic en el fondo
+        dialog.addEventListener('close', function () {
+          lockScroll(false);
+          if (dialog.__opener) dialog.__opener.focus();
+        });
+
+        // Si el servidor devolvió errores, abrir al cargar
+        if (dialog.getAttribute('data-autoopen') === '1') {
+          openDialog(dialog, document.querySelector('[data-dialog-open="' + dialog.id + '"]'));
+        }
+      });
+    } catch (err) {
+      console.error('Viñetas:', err);
+    }
   })();
 </script>
