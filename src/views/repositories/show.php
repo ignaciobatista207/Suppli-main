@@ -72,8 +72,8 @@ $gondolaCategory = (int) ($gondolaOld["category_id"] ?? 0);
     <ul class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       <?php foreach ($gondolas as $gondola): ?>
         <li>
-          <!-- TODO: convertir la tarjeta en enlace a la vista de productos de la góndola -->
-          <article class="overflow-hidden rounded-xl border border-ink/20 bg-card shadow-sm">
+          <a href="/repositorios/<?= $repoId ?>/gondolas/<?= (int) $gondola["id"] ?>"
+             class="block overflow-hidden rounded-xl border border-ink/20 bg-card shadow-sm transition-shadow hover:shadow-md <?= $focusRing ?>">
             <div class="h-2.5" style="background-color: <?= html(Palette::safe((string) $gondola["color"])) ?>" aria-hidden="true"></div>
             <div class="p-4">
               <h2 class="truncate font-display text-lg font-extrabold" title="<?= html((string) $gondola["name"]) ?>">
@@ -85,7 +85,7 @@ $gondolaCategory = (int) ($gondolaOld["category_id"] ?? 0);
                   : html((string) $gondola["category_name"]) ?>
               </p>
             </div>
-          </article>
+          </a>
         </li>
       <?php endforeach; ?>
     </ul>
