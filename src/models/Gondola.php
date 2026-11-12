@@ -43,6 +43,44 @@ final class Gondola
     );
   }
 
+  /**
+   * Una góndola SOLO si pertenece a ese repositorio; si no, null.
+   *
+   * @return array{id: int, repository_id: int, category_id: int, name: string, color: string, category_name: string, parent_category_name: string|null}|null
+   */
+  public function findInRepository(int $gondolaId, int $repoId): ?array
+  {
+    $stmt = $this->database->getConnection()->prepare(
+      "SELECT g.id, g.repository_id, g.category_id, g.name, g.color,
+              c.name AS category_name,
+              p.name AS parent_category_name
+       FROM gondolas g
+       INNER JOIN categories c ON c.id = g.category_id
+       LEFT JOIN categories p ON p.id = c.parent_id
+       WHERE g.id = :gondola_id AND g.repository_id = :repository_id
+       LIMIT 1",
+    );
+    $stmt->execute(["gondola_id" => $gondolaId, "repository_id" => $repoId]);
+
+    $row = $stmt->fetch();
+
+    if ($row === false) {
+      return null;
+    }
+
+    return [
+      "id" => (int) $row["id"],
+      "repository_id" => (int) $row["repository_id"],
+      "category_id" => (int) $row["category_id"],
+      "name" => (string) $row["name"],
+      "color" => Palette::safe((string) $row["color"]),
+      "category_name" => (string) $row["category_name"],
+      "parent_category_name" => $row["parent_category_name"] === null
+        ? null
+        : (string) $row["parent_category_name"],
+    ];
+  }
+
   public function existsByName(int $repoId, string $name): bool
   {
     $stmt = $this->database->getConnection()->prepare(

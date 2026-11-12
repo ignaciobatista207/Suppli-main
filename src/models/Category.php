@@ -51,6 +51,45 @@ final class Category
     return $tree;
   }
 
+  /**
+   * Categorías que puede tener un producto de una góndola.
+   *
+   * - La primera opción es SIEMPRE la categoría de la góndola.
+   * - Si esa categoría es principal y tiene subcategorías, siguen sus hijos.
+   * - Si es una subcategoría, o una principal sin hijos, hay una sola opción.
+   *
+   * @return list<array{id: int, name: string}>
+   */
+  public function optionsForGondola(int $categoryId): array
+  {
+    $category = $this->findById($categoryId);
+
+    if ($category === null) {
+      return [];
+    }
+
+    $options = [
+      ["id" => (int) $category["id"], "name" => (string) $category["name"]],
+    ];
+
+    if ($category["parent_id"] !== null) {
+      return $options;
+    }
+
+    $stmt = $this->database->getConnection()->prepare(
+      "SELECT id, name FROM categories
+       WHERE parent_id = :parent_id
+       ORDER BY sort_order ASC, name ASC",
+    );
+    $stmt->execute(["parent_id" => (int) $category["id"]]);
+
+    foreach ($stmt->fetchAll() as $row) {
+      $options[] = ["id" => (int) $row["id"], "name" => (string) $row["name"]];
+    }
+
+    return $options;
+  }
+
   public function existsById(int $id): bool
   {
     $stmt = $this->database->getConnection()->prepare(
