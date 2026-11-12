@@ -1,12 +1,12 @@
 -- Renglones de cada venta. unit_price guarda el precio al momento de cobrar,
 -- para que cambiar el precio del producto no altere ventas pasadas.
 CREATE TABLE sale_items (
-    id         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    sale_id   BIGINT UNSIGNED NOT NULL,
+    id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    sale_id    BIGINT UNSIGNED NOT NULL,
     product_id BIGINT UNSIGNED NOT NULL,
-    quantity   INT           NOT NULL,
-    unit_price DECIMAL(10,2) NOT NULL,
-    subtotal   DECIMAL(12,2) NOT NULL,
+    quantity   INT             NOT NULL,
+    unit_price DECIMAL(10,2)   NOT NULL,
+    subtotal   DECIMAL(12,2)   NOT NULL,
     PRIMARY KEY (id),
     KEY idx_sale_items_sale (sale_id),
     KEY idx_sale_items_product (product_id),

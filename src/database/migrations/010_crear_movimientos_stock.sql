@@ -4,14 +4,14 @@
 --   ajuste         -> cualquiera (distinto de 0)
 -- sale_id solo se completa cuando el movimiento viene de una venta.
 CREATE TABLE stock_movements (
-    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    product_id BIGINT UNSIGNEDNOT NULL,
+    id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    product_id BIGINT UNSIGNED NOT NULL,
     user_id    INT UNSIGNED    NOT NULL,
     sale_id    BIGINT UNSIGNED NULL,
     type       ENUM('entrada', 'salida', 'venta', 'ajuste') NOT NULL,
-    quantity   INT          NOT NULL,
-    note       VARCHAR(255) NULL,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    quantity   INT             NOT NULL,
+    note       VARCHAR(255)    NULL,
+    created_at TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_movements_product_date (product_id, created_at),
     KEY idx_movements_user (user_id),
