@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 -- Datos iniciales del catálogo de categorías (9 principales + 21 subcategorías).
 -- Se puede ejecutar más de una vez: ON DUPLICATE KEY UPDATE actúa sobre el slug (UNIQUE).
 -- No se usan ids fijos: cada subcategoría busca a su padre por slug.
@@ -172,4 +172,3 @@ ON DUPLICATE KEY UPDATE
     categories.parent_id  = VALUES(parent_id),
     categories.name       = VALUES(name),
     categories.sort_order = VALUES(sort_order);
-======
