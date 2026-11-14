@@ -11,6 +11,9 @@ use App\Models\Gondola;
 use App\Models\Product;
 use App\Models\Repository;
 use App\Models\User;
+use App\Controllers\CashController;
+use App\Models\CashSession;
+use App\Models\Sale;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\PhpRenderer;
@@ -46,6 +49,19 @@ return static function (App $app, PhpRenderer $renderer, Database $database): vo
     $categories,
     $products,
   );
+
+  $cashSessions = new CashSession($database);
+  $sales = new Sale($database);
+  $cashController = new CashController(
+    $renderer,
+    $users,
+    $repositories,
+    $repositoryController,
+    $cashSessions,
+    $sales,
+    $products,
+  );
+
   $requireAuth = new RequireAuth($app->getResponseFactory());
 
   // Landing

@@ -35,15 +35,22 @@ class Database
       return $this->connection;
     }
 
-    try {
+       try {
       $port = $_ENV["DB_PORT"] ?? ($this->driver === "pgsql" ? "5432" : "3306");
       $dsn = $this->buildDsn($port);
 
-      $this->connection = new PDO($dsn, $this->username, $this->password, [
+      $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
-      ]);
+      ];
+
+      // Solo MySQL/MariaDB: la sesión de la base usa la misma hora que PHP (UTC-3)
+      if ($this->driver === "mysql") {
+        $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET time_zone = '-03:00'";
+      }
+
+      $this->connection = new PDO($dsn, $this->username, $this->password, $options);
 
       return $this->connection;
     } catch (PDOException $e) {
