@@ -111,6 +111,14 @@ return static function (App $app, PhpRenderer $renderer, Database $database): vo
       [$productController, "updateStock"],
     );
 
-    // TODO: /caja (vista aparte, sin layouts/app.php)
+       // Caja registradora
+    $group->get("/caja", [$cashController, "index"]);
+    $group->get("/repositorios/{id:[0-9]+}/caja", [$cashController, "show"]);
+    $group->post("/repositorios/{id:[0-9]+}/caja/abrir", [$cashController, "open"]);
+    $group->get("/repositorios/{id:[0-9]+}/caja/productos", [$cashController, "searchProducts"]);
+    $group->post("/repositorios/{id:[0-9]+}/caja/ventas", [$cashController, "sell"]);
+    $group->get("/repositorios/{id:[0-9]+}/caja/cierre", [$cashController, "closeForm"]);
+    $group->post("/repositorios/{id:[0-9]+}/caja/cerrar", [$cashController, "close"]);
+    $group->get("/repositorios/{id:[0-9]+}/caja/ventas", [$cashController, "history"]);
   })->add($requireAuth);
 };
