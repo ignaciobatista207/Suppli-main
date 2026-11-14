@@ -10,6 +10,7 @@ use App\Models\Product;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
+use Slim\Exception\HttpNotFoundException;
 
 final class ProductController
 {
@@ -57,7 +58,7 @@ final class ProductController
       $errors[] = "Ingresa el nombre del producto.";
     } elseif (mb_strlen($name) > 150) {
       $errors[] = "El nombre no puede superar los 150 caracteres.";
-    } elseif ($this->products->existsByName($gondolaId, $name)) {
+      } elseif ($this->products->existsByName($repositoryId, $gondolaId, $name)) {
       $errors[] = "Ya existe un producto con ese nombre en esta góndola.";
     }
 
@@ -119,6 +120,90 @@ final class ProductController
     );
 
     flash("Producto guardado.");
+
+    return redirect($response, "/repositorios/" . $repositoryId . "/gondolas/" . $gondolaId);
+  }
+
+    /** POST /repositorios/{id}/gondolas/{gondolaId}/productos/{productId}/stock (solo admin) */
+  public function updateStock(Request $request, Response $response, array $args): Response
+  {
+    // 404 si no es miembro o la góndola no es de ese repositorio; 403 si no es admin
+    $repository = $this->repositoryController->adminOrFail($request, $args);
+    $gondola = $this->gondolaController->gondolaOrFail($request, $args, $repository);
+
+    $productId = filter_var($args["productId"] ?? null, FILTER_VALIDATE_INT, [
+      "options" => ["min_range" => 1],
+    ]);
+
+    if ($productId === false) {
+      throw new HttpNotFoundException($request);
+    }
+
+    // El repositorio sale SIEMPRE de la URL ya validada, nunca del formulario
+    $repositoryId = (int) $repository["id"];
+    $gondolaId = (int) $gondola["id"];
+
+    // El producto debe ser de esta góndola y de este repositorio → si no, 404
+    if ($this->products->findInGondola($productId, $gondolaId, $repositoryId) === null) {
+      throw new HttpNotFoundException($request);
+    }
+
+    $data = (array) $request->getParsedBody();
+    $newInput = trim((string) ($data["new_stock"] ?? ""));
+    $expectedInput = trim((string) ($data["expected_stock"] ?? ""));
+
+    // Entero 0–9.999.999 (hasta 7 dígitos)
+    $newStock = preg_match('/^\d{1,7}$/', $newInput) === 1 ? (int) $newInput : null;
+    $expectedStock = self::parseCount($expectedInput);
+
+    $errors = [];
+
+    if ($newStock === null) {
+      $errors[] = "El stock debe ser un número entero entre 0 y 9.999.999.";
+    }
+
+    if ($expectedStock === null) {
+      $errors[] = "No se pudo verificar el stock que veías. Recarga la página e intenta de nuevo.";
+    }
+
+    if ($errors !== [] || $newStock === null || $expectedStock === null) {
+      return $this->gondolaController->renderShow(
+        $response->withStatus(422),
+        $repository,
+        $gondola,
+        [],
+        [],
+        false,
+        $errors,
+      );
+    }
+
+    $result = $this->products->adjustStock(
+      $repositoryId,
+      $gondolaId,
+      $productId,
+      $newStock,
+      $expectedStock,
+      (int) $_SESSION["user_id"],
+    );
+
+    if ($result === "not_found") {
+      throw new HttpNotFoundException($request);
+    }
+
+    if ($result === "conflict") {
+      return $this->gondolaController->renderShow(
+        $response->withStatus(422),
+        $repository,
+        $gondola,
+        [],
+        [],
+        false,
+        ["El stock cambió mientras editabas. Recarga e intenta de nuevo."],
+      );
+    }
+
+    flash($result === "unchanged" ? "Sin cambios." : "Stock actualizado.");
 
     return redirect($response, "/repositorios/" . $repositoryId . "/gondolas/" . $gondolaId);
   }

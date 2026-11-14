@@ -90,6 +90,11 @@ return static function (App $app, PhpRenderer $renderer, Database $database): vo
       [$productController, "store"],
     );
 
+        $group->post(
+      "/repositorios/{id:[0-9]+}/gondolas/{gondolaId:[0-9]+}/productos/{productId:[0-9]+}/stock",
+      [$productController, "updateStock"],
+    );
+
     // TODO: /caja (vista aparte, sin layouts/app.php)
   })->add($requireAuth);
 };

@@ -127,14 +127,15 @@ final class GondolaController
     return $gondola;
   }
 
-  /**
-   * Renderiza la página de la góndola. También la usa ProductController::store
-   * para volver con errores (422) y la viñeta abierta.
+   /**
+   * Renderiza la página de la góndola. También la usa ProductController
+   * (store y updateStock) para volver con errores (422).
    *
    * @param array{id: int, name: string, color: string, role: string} $repository
    * @param array<string, mixed> $gondola
-   * @param list<string>         $errors
+   * @param list<string>         $errors       Errores de la viñeta "Agregar producto".
    * @param array<string, mixed> $old
+   * @param list<string>         $stockErrors  Errores de la edición manual de stock.
    */
   public function renderShow(
     Response $response,
@@ -143,6 +144,7 @@ final class GondolaController
     array $errors = [],
     array $old = [],
     bool $openDialog = false,
+    array $stockErrors = [],
   ): Response {
     $user = $this->users->findById((int) $_SESSION["user_id"]);
 
@@ -165,13 +167,17 @@ final class GondolaController
         "repository" => $repository,
         "gondola" => $gondola,
         "isAdmin" => $isAdmin,
-        "products" => $this->products->listByGondola((int) $gondola["id"]),
+        "products" => $this->products->listByGondola(
+          (int) $repository["id"],
+          (int) $gondola["id"],
+        ),
         "categoryOptions" => $isAdmin
           ? $this->categories->optionsForGondola((int) $gondola["category_id"])
           : [],
         "errors" => $errors,
         "old" => $old,
         "openDialog" => $openDialog,
+        "stockErrors" => $stockErrors,
       ],
       "layouts/app.php",
     );
