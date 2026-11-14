@@ -10,6 +10,9 @@ require_once __DIR__ . '/database/database.php';
 // Cargar variables de entorno desde el .env
 Dotenv::createImmutable(__DIR__ . '/..')->safeLoad();
 
+// Zona horaria de PHP: Argentina (UTC-3, sin horario de verano)
+date_default_timezone_set("America/Argentina/Buenos_Aires");
+
 $env = $_ENV["APP_ENV"] ?? "prod";
 $allowedEnvs = ["dev", "prod"];
 
