@@ -80,12 +80,13 @@ return static function (App $app, PhpRenderer $renderer, Database $database): vo
   $app->post("/register", [$auth, "register"]);
 
   // Área privada (todo lo que está dentro del grupo exige sesión)
-  $app->group("", function (RouteCollectorProxy $group) use (
+    $app->group("", function (RouteCollectorProxy $group) use (
     $auth,
     $dashboard,
     $repositoryController,
     $gondolaController,
     $productController,
+    $cashController,
   ) {
     $group->post("/logout", [$auth, "logout"]);
 
