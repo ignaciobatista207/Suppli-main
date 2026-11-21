@@ -1,6 +1,5 @@
 # Suppli
 
-**Descripción:**
 Suppli es una aplicación web para gestionar el stock de un comercio y cobrar en caja desde el mismo lugar. Los productos se organizan en repositorios y góndolas, cada venta descuenta el stock automáticamente y cada turno de caja se cierra con el efectivo esperado, el contado y la diferencia.
 
 Integrantes:
